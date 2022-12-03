@@ -8,8 +8,8 @@ output:
 
 ## Loading and preprocessing the data
 
-```{r}
 
+```r
 ## Check if the file already exists under the working directory, if not, download and unzip it.
 unzipped_file<- "activity.csv"
 
@@ -27,12 +27,11 @@ data <- read.csv("activity.csv")
 
 ## Convert Date column to date
 data$date <- as.Date(data$date, format="%Y-%m-%d")
-
 ```
 
 ## What is mean total number of steps taken per day?
-```{r message=FALSE, warning=FALSE}
 
+```r
 ## Include required libraries
 library(dplyr)
 
@@ -43,21 +42,24 @@ summary_per_day <- data %>% select(steps, date) %>% group_by(date) %>%
 
 ## Create a new histogram displaying Steps per Day
 hist(summary_per_day$Steps,xlab="Steps",main="Steps per Day",col="red")
+```
 
+![plot of chunk unnamed-chunk-2](figure/unnamed-chunk-2-1.png)
+
+```r
 ## Calculate the median and mean steps per day
 meanperday <- round(mean(summary_per_day$Steps,na.rm=TRUE),digits=0)
 medianperday <- round(median(summary_per_day$Steps,na.rm=TRUE),digits=0)
-
 ```
 
-The mean number of steps per day is `r meanperday` and the median steps per day 
-is `r medianperday`.
+The mean number of steps per day is 1.0766 &times; 10<sup>4</sup> and the median steps per day 
+is 1.0765 &times; 10<sup>4</sup>.
 
 
 ## What is the average daily activity pattern?
 
-```{r message=FALSE, warning=FALSE}
 
+```r
 ## Calculate the total steps per day
 summary_per_interval <- data %>% select(steps, interval) %>% group_by(interval) %>% 
     summarise(MeanSteps = mean(steps,na.rm=TRUE),Steps = sum(steps,na.rm=TRUE))
@@ -66,28 +68,30 @@ summary_per_interval <- data %>% select(steps, interval) %>% group_by(interval) 
 plot(summary_per_interval$interval, summary_per_interval$MeanSteps, type="l", 
      col="red", xlab="Interval", ylab="Average Steps per Interval", xaxt="n")
 axis(1, at = seq(0,2355, by = 5), las=2)
+```
 
+![plot of chunk unnamed-chunk-3](figure/unnamed-chunk-3-1.png)
+
+```r
 ## Find the interval that has the maximum steps
 maximum_steps <- summary_per_interval  %>% slice(which.max(Steps))
-
 ```
 
 The 5-minute interval, on average across all the days in the data set that contains  
-the maximum number of steps is `r maximum_steps$interval`.
+the maximum number of steps is 835.
 
 ## Imputing missing values
 
-```{r message=FALSE, warning=FALSE}
 
+```r
 ## Calculate the number of rows where missing values exist
 number_of_rows_with_na <- nrow(which(is.na(data), arr.ind=TRUE))
-
 ```
 
-The number of rows that contain missing values are: `r number_of_rows_with_na`.
+The number of rows that contain missing values are: 2304.
 
-```{r message=FALSE, warning=FALSE}
 
+```r
 ## Create a new data set where missing values are set to the mean number of steps 
 ## of the corresponding date
 ## Step 1 identify missing data records
@@ -123,19 +127,22 @@ summary_per_day_imputed<- imputed_data %>% select(steps, date) %>%
 ## Create a new histogram displaying Steps per Day including Imputed data
 hist(summary_per_day_imputed$Steps,xlab="Steps",
      main="Steps per Day (Including Imputed data)",col="red")
+```
 
+![plot of chunk unnamed-chunk-5](figure/unnamed-chunk-5-1.png)
+
+```r
 ## Calculate the median and mean steps per day based on the imputed data
 meanperday_imputed <- round(mean(summary_per_day_imputed$Steps,na.rm=TRUE),digits=0)
 medianperday_imputed <- round(median(summary_per_day_imputed$Steps,na.rm=TRUE),digits=0)
-
 ```
 
-The mean imputed steps per day is `r meanperday_imputed` 
-and the median imputed steps per day is `r medianperday_imputed`.
+The mean imputed steps per day is 1.0766 &times; 10<sup>4</sup> 
+and the median imputed steps per day is 1.0766 &times; 10<sup>4</sup>.
 
 
-```{r message=FALSE, warning=FALSE}
 
+```r
 ## Check imputed values to see how they are compared to actual values
 if(meanperday_imputed==meanperday)
     {means<-"Equal"}
@@ -151,16 +158,15 @@ if(medianperday_imputed==medianperday)
         {medians<-"less than"}
         {medians<-"greater than"}
     }
-
 ```
 
-The Imputed mean value is `r means` the actual mean value.  
-The Imputed median value is `r medians` the actual median value.
+The Imputed mean value is greater than the actual mean value.  
+The Imputed median value is greater than the actual median value.
 
 ## Are there differences in activity patterns between weekdays and weekends?
 
-```{r message=FALSE, warning=FALSE}
 
+```r
 ## Include required libraries
 library(ggplot2)
 
@@ -186,6 +192,6 @@ imputed_data$weekend_indicator<-as.factor(imputed_data$weekend_indicator)
 qplot(interval,Steps, geom = "col",data=summary_per_interval_daytype)+
   facet_wrap( ~weekend_indicator,ncol=1,nrow=2)+
   labs(x ="Interval", y = "Number of Steps") 
-
-
 ```
+
+![plot of chunk unnamed-chunk-7](figure/unnamed-chunk-7-1.png)
